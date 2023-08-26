@@ -33,3 +33,26 @@ export const updateuser = (data, id, callback) => {
 
     )
 }
+
+
+export const loginUser = (data, callback) => {
+    db.query(
+        "SELECT id FROM users WHERE email = ? AND user_password = ?",
+        [data.email, data.user_password],
+        (error, results, fields) => {
+            if (error)
+            {
+               return callback(error);
+            } 
+
+            if (results.length > 0)
+            {
+                return callback(null, "login sucess")
+            } else
+            {
+                return callback(null, "invalid credentials")
+            }
+        }
+
+    )
+}
