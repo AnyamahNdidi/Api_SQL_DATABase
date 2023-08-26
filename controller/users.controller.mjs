@@ -1,4 +1,4 @@
-import { register,updateuser } from "../services/users.service.mjs"
+import { register,updateuser, loginUser } from "../services/users.service.mjs"
 
 export const registerUser = (req, res, next) => {
 
@@ -56,5 +56,29 @@ export const updateUser = (req, res) => {
             data:result
         })
         
+    })
+}
+
+export const regUser = (req,res) => {
+    
+    const  {email, password} = req.body
+    const data = {
+        email: email,
+        user_password:password
+    }
+    loginUser(data, (error, results) => {
+        if (error)
+        { 
+            console.log(error.message)
+          return  res.status(404).json({
+                sucesss: 0,
+                message:error.message,
+            })
+        }
+
+        return res.status(200).json({
+            sucesss: 1,
+        data:results
+        })
     })
 }
