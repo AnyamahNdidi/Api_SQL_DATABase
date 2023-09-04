@@ -40,3 +40,52 @@ export const addpost = (data, id, callback) => {
         }
     )
 }
+
+
+export const getAllPost = (data, callback) => {
+
+    const query = `
+    SELECT p.id as postID, p.describtion, p.imagePath, p.likeCount, p.dislikeCount, u.email, u.first_name  FROM posts p inner join users u on p.addedByUserId = u.id
+    `
+    db.query(query, [],
+        (error, result, fields) => {
+            if (error)
+            {
+              return callback(error);
+            }
+            
+            return callback(null, result)
+        }
+    )
+    
+}
+
+
+export const getSingleUserPost = (id, callback) => {
+
+    const query = `
+      SELECT * FROM posts INNER JOIN users on posts.addedByUserId = users.id
+      WHERE posts.addedByUserId = ?
+    `
+
+    db.query(query,
+            [id],
+        (error, result, fields) => {
+
+        if (error)
+            {
+              return callback(error);
+            }
+
+            console.log("this is result",result.length)
+
+      if (result.length === 0) {
+            // If no user with the provided ID is found, return an error message
+            return callback("No user found with this id ");
+        }
+            return callback(null, result)
+        }
+        
+    )
+    
+}
