@@ -1,4 +1,4 @@
-import { addpost, getAllPost,getSingleUserPost} from "../services/post.service.mjs"
+import { addpost, getAllPost,getSingleUserPost,addUserPostComment} from "../services/post.service.mjs"
 
 
 export const addUserPost = (req, res) => {
@@ -63,3 +63,27 @@ export const getSingleUserPosts = (req, res) => {
     })
     
 }
+
+
+export const postComment = (req, res) => {
+    const {userid} = req.params
+    const { postid } = req.params
+    
+    const {comment} = req.body
+    const data = {
+        comment: comment
+    }
+    addUserPostComment(data, userid, postid, (error, result) => {
+        
+           if (error) {
+       
+        return res.status(400).send({ success: 0, data: error });
+        };
+
+        return res.status(200).json({
+            success: 1,
+            data: result
+        })
+    })
+    
+ }
