@@ -89,3 +89,22 @@ export const getSingleUserPost = (id, callback) => {
     )
     
 }
+
+export const addUserPostComment = (data, userId, Idpost, callback) => {
+    const query = `
+      INSERT INTO comments (postId, comment, dataTimeCreated, addedByUserid) value (?,?,?,?)
+    `
+    db.query(query,
+        [Idpost, data.comment,  new Date(), userId],
+        (error, result, fields) => {
+            if (error)
+            {
+                callback(error)
+            }
+
+            let comData = data 
+            let all = {...data, userId, Idpost }
+            return callback(null, all)
+        }
+    )
+}
