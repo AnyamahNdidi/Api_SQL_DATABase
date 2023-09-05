@@ -1,4 +1,4 @@
-import { addpost, getAllPost,getSingleUserPost,addUserPostComment} from "../services/post.service.mjs"
+import { addpost, getAllPost,getSingleUserPost,addUserPostComment,getpostAndAllComment, dislikePost, likePost, deletePost} from "../services/post.service.mjs"
 
 
 export const addUserPost = (req, res) => {
@@ -86,4 +86,65 @@ export const postComment = (req, res) => {
         })
     })
     
- }
+}
+ 
+export const getPostAllComment = (req, res) => {
+    const { postid } = req.params
+    getpostAndAllComment(postid, (error, result) => {
+        if (error) {
+       
+        return res.status(400).send({ success: 0, data: error });
+        };
+
+        return res.status(200).json({
+            success: 1,
+            data: result
+        })
+    })
+}
+ 
+export const userLike = (req, res) => {
+    const { postid } = req.params
+    likePost(postid, (error, result) => {
+      if (error) {
+       
+        return res.status(400).send({ success: 0, data: error });
+        };
+
+        return res.status(200).json({
+            success: 1,
+            data: result
+        })     
+        
+    })
+}
+
+export const userDislike = (req, res) => {
+    const { postid } = req.params
+    dislikePost(postid, (error, result) => {
+        if (error) {
+         return res.status(400).send({ success: 0, data: error });
+        };
+
+        return res.status(200).json({
+            success: 1,
+            data: result
+        })     
+        
+    })
+}
+
+export const postDelete = (req, res) => { 
+     const { postid } = req.params
+    deletePost(postid, (error, result) => {
+        if (error) {
+         return res.status(400).send({ success: 0, data: error });
+        };
+
+        return res.status(200).json({
+            success: 1,
+            data: result
+        }) 
+        
+    })
+}

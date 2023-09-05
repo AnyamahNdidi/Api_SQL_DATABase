@@ -1,5 +1,6 @@
 import {db} from "../config/db.config.mjs"
 
+// return the post details and the user who add the post to the database
 export const addpost = (data, id, callback) => {
     const query = `
     INSERT INTO posts (describtion, imagePath,datetimecreated,addedByUserId) VALUE (?,?,?,?)
@@ -107,4 +108,139 @@ export const addUserPostComment = (data, userId, Idpost, callback) => {
             return callback(null, all)
         }
     )
+}
+
+export const getpostAndAllComment = ( postId, callback) => {
+
+    // variable for holding post and user informatio(user information in object)
+
+    const postWithUserAndComments = {
+        post: null,
+        user: null,
+        comment:[]
+
+    }
+
+    const querypost = `
+        select * from posts where id = ?
+    `
+
+    const queryuser = `
+      SELECT  users.first_name, users.last_name from posts p INNER JOIN users on p.addedByUserId = users.id
+       WHERE p.id = ?
+    `
+
+     const queryComment = `
+        SELECT c.id,c.comment, c.dataTimeCreated, c.addedByUserId, u.first_name, u.last_name FROM comments c INNER JOIN users u on c.addedByUserid = u.id
+        WHERE c.postid = ?
+    `
+
+    db.query(querypost, [postId], (error, result, fields) => {
+        if (error)
+        {
+            return callback(error)
+        }
+
+        if (result.length === 0)
+        {
+            return callback("No posts found with this id")
+        }
+
+        console.log("this is result", result)
+        postWithUserAndComments.post = result[0]
+
+        db.query(queryuser, [postId], (error, result, fields) => {
+              
+        if (error)
+        {
+            return callback(error)
+        }
+
+        if (result.length === 0)
+            {
+            return callback("No posts found with this id")
+            }
+
+            postWithUserAndComments.user = result[0]
+        
+            db.query(queryComment, [postId], (error, result, fields) => {
+                  if (error)
+        {
+            return callback(error)
+                }
+                
+                postWithUserAndComments.comment = result
+                return callback(null, postWithUserAndComments);
+            })   
+        })
+       
+    })
+
+    
+}
+
+export const likePost = (postId, callback) => {
+    const query = `
+    UPDATE posts SET likeCount = likeCount + 1 WHERE id = ?
+    `
+    db.query(query, [postId], (error, result, fields) => {
+        if (error)
+        {
+            return callback(error)
+        }
+
+        if (result.affectedRows  ===1)
+        {
+            return callback(null, "like sucessfully")
+        } else
+        {
+         return callback( new Error("Invalid post")) 
+        }
+        
+       
+    })
+}
+export const dislikePost = (postId, callback) => {
+    const query = `
+    UPDATE posts SET dislikeCount = dislikeCount + 1 WHERE id = ?
+    `
+    db.query(query, [postId], (error, result, fields) => {
+        if (error)
+        {
+            return callback(error)
+        }
+
+        if (result.affectedRows  ===1)
+        {
+            return callback(null, "Dislike sucessfully")
+        } else
+        {
+         return callback( new Error("Invalid post")) 
+        }
+        
+       
+    })
+}
+
+
+export const deletePost = (postId, callback) => {
+    const query = `
+    DELETE FROM posts WHERE id = ? 
+    `
+    db.query(query, [postId],  (error, result, fields) => {
+        if (error)
+        {
+            callback(error)
+        } 
+        
+        if (result.affectedRows === 1)
+        {
+            callback(null, "deleted successfully")
+            
+        } else
+        {
+            return callback( new Error("Invalid post")) 
+        }
+    })
+    
 }
