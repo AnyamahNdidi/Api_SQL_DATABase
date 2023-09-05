@@ -34,7 +34,7 @@ export const  getAllUserPost = (req, res) => {
     getAllPost(data, (error, result) => {
         if (error) {
        
-        return res.status(400).send({ success: 0, data: "Bad request" });
+        return res.status(400).send({ success: 0, data: error });
         };
 
         return res.status(200).json({
