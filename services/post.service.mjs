@@ -45,17 +45,63 @@ export const addpost = (data, id, callback) => {
 
 export const getAllPost = (data, callback) => {
 
+    const postDataAll= []
+
+    const queryPost = `
+    SELECT * FROM posts
+    `
     const query = `
     SELECT p.id as postID, p.describtion, p.imagePath, p.likeCount, p.dislikeCount, u.email, u.first_name  FROM posts p inner join users u on p.addedByUserId = u.id
     `
+
+     const queryComment = `
+        SELECT c.id,c.comment, c.dataTimeCreated, c.addedByUserId, u.first_name, u.last_name FROM comments c INNER JOIN users u on c.addedByUserid = u.id
+        WHERE c.postid = ?
+    `
+
     db.query(query, [],
         (error, result, fields) => {
             if (error)
             {
               return callback(error);
             }
+
+            result.forEach(postData => {
+                
+                const postUser = {
+                    id: postData.postID,
+                    describtion: postData.describtion,
+                    imagePath:postData.imagePath,
+                    user: {
+                        first_name: postData.first_name,
+                        last_name: postData.last_name
+   
+                    },
+                    comment:[]
+                }
+                console.log("jukeman", postUser)
+                console.log("ole", postData.postID)
+               
+
+                db.query(queryComment, [postData.postID], (commentserror, commentresult, fields) => {
+                    if (error)
+                    {
+                        return callback(error)
+                    }
+                    postUser.comment = commentresult
+                    postDataAll.push(postUser)
+
+                    if (postDataAll.length === result.length )
+                    {
+                         return callback(null, postDataAll)
+                    }
+
+                })
+ 
+            })
+
             
-            return callback(null, result)
+           
         }
     )
     
